@@ -1,0 +1,23 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: ap-south-1
+    ECR_REPO: 959449948154.dkr.ecr.ap-south-1.amazonaws.com/brain-tasks-app
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
+
+  build:
+    commands:
+      - echo Building Node.js Docker image
+      - docker build -t brain-tasks-app .
+
+  post_build:
+    commands:
+      - echo Pushing image to ECR
+      - docker tag brain-tasks-app:latest $ECR_REPO:latest
+      - docker push $ECR_REPO:latest
